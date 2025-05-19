@@ -35,7 +35,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         // this condition for the first authenticate request so that generate the token
         if (username != null && SecurityContextHolder.getContext().getAuthentication() == null){
-            if (jwtToken != null){
+
 
                 UserDetails userDetails = userDetailsServiceImp.loadUserByUsername(username);
                 if (jwtUtil.validate(username,userDetails,jwtToken)){

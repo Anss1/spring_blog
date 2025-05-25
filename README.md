@@ -1,6 +1,6 @@
 # 📝 Blog REST API
 
-A simple and clean **RESTful API for a blogging platform**, built with **Spring Boot**, **Spring Data JPA**, and **MySQL**.
+A simple and clean **RESTful API for a blogging platform**, built with **Spring Boot**,**Spring Security**, **Spring Data JPA**, and **MySQL**.
 
 ---
 

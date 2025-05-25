@@ -33,7 +33,7 @@ A simple and clean **RESTful API for a blogging platform**, built with **Spring 
 
 ### Prerequisites
 
-- Java 17+
+- Java 21
 - Maven
 - MySQL installed and running
 

@@ -6,7 +6,7 @@ A simple and clean **RESTful API for a blogging platform**, built with **Spring 
 
 ## 🚀 Features
 
-- 🔐 User registration & login (with basic JWT/Spring Security setup - optional)
+- 🔐 **User Registration & Login** and **JWT Token Authentication** with Spring Security
 - 📝 CRUD operations on blog posts
 - 💬 Commenting system (optional)
 - 🔎 Get posts by author, category, or keyword
@@ -20,6 +20,8 @@ A simple and clean **RESTful API for a blogging platform**, built with **Spring 
 |-----------------|----------------------------------|
 | Java 17         | Core language                   |
 | Spring Boot     | Backend framework               |
+| Spring Security | Authentication & authorization  |
+| JSON Web Tokens | Token-based user sessions       |
 | Spring Data JPA | ORM & database access           |
 | MySQL           | Relational database             |
 | Maven           | Build and dependency management |

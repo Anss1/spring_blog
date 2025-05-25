@@ -1,11 +1,42 @@
-# Spring_Blog
-<h2>Description</h2>
-<p>It is a simple backend project to practise on <strong>spring security</strong> and <strong>JWT auth</strong> by creating a simple blog webapp</p>
+# 📝 Blog REST API
 
-<h2>Tools</h2>
-<ul>
-  <li>Spring boot</li>
-  <li>spring security</li>
-  <li>spring JPA</li>
-  <li>JWT authetication</li>
-</ul>
+A simple and clean **RESTful API for a blogging platform**, built with **Spring Boot**, **Spring Data JPA**, and **MySQL**.
+
+---
+
+## 🚀 Features
+
+- 🔐 User registration & login (with basic JWT/Spring Security setup - optional)
+- 📝 CRUD operations on blog posts
+- 💬 Commenting system (optional)
+- 🔎 Get posts by author, category, or keyword
+- 📦 JSON-based API for integration with any frontend
+
+---
+
+## 📦 Technologies Used
+
+| Tech            | Purpose                         |
+|-----------------|----------------------------------|
+| Java 17         | Core language                   |
+| Spring Boot     | Backend framework               |
+| Spring Data JPA | ORM & database access           |
+| MySQL           | Relational database             |
+| Maven           | Build and dependency management |
+| JUnit           | Testing (optional)              |
+
+---
+
+## ⚙️ Getting Started
+
+### Prerequisites
+
+- Java 17+
+- Maven
+- MySQL installed and running
+
+### Clone the project
+
+```bash
+git clone https://github.com/Anss1/spring-blog.git
+cd blog-api

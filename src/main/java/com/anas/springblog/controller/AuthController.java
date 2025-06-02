@@ -5,18 +5,17 @@ import com.anas.springblog.model.User;
 import com.anas.springblog.service.UserService;
 import com.anas.springblog.utility.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.BadCredentialsException;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
+@CrossOrigin
 public class AuthController {
 
     @Autowired
@@ -32,7 +31,7 @@ public class AuthController {
     private PasswordEncoder passwordEncoder;
 
     @PostMapping("/signup")
-    public ResponseEntity<String> signup(@RequestBody User user){
+    public ResponseEntity<String> signup(@RequestBody User user) {
 
         user.setPassword(passwordEncoder.encode(user.getPassword()));
         userService.saveUser(user);
@@ -40,24 +39,35 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthRequest authRequest){
+    public ResponseEntity<String> login(@RequestBody AuthRequest authRequest) {
 
-//            authenticationManager.authenticate(
-//                    new UsernamePasswordAuthenticationToken(
-//                            authRequest.getUsername(),
-//                            authRequest.getPassword()
-//                    )
-//            );
-            if (authenticate(authRequest.getUsername(),authRequest.getPassword())){
-                String token = jwtUtil.generateToken(authRequest.getUsername());
+        try {
+            authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(
+                            authRequest.getUsername(),
+                            authRequest.getPassword()
+                    )
+            );
+            User loginUser = userService.loadUserByUsername(authRequest.getUsername());
+            String token = jwtUtil.generateToken(loginUser);
+            return ResponseEntity.ok(token);
+        }
+        catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Username or Password");
+        }
+        // This logic here for test purposes
+//        if (authenticate(authRequest.getUsername(), authRequest.getPassword())) {
+//            String token = jwtUtil.generateToken(authRequest.getUsername());
+//
+//            return ResponseEntity.ok(token);
+//        }
+//        throw new BadCredentialsException("Invalid username or password");
 
-                return ResponseEntity.ok(token);
-            }
-            throw new BadCredentialsException("Invalid username or password");
     }
 
-    private boolean authenticate(String username, String password){
-        UserDetails userDetails = userService.loadUserByUsername(username);
-        return passwordEncoder.matches(password,userDetails.getPassword());
-    }
+    // this method for test purposes
+//    private boolean authenticate(String username, String password) {
+//        User userDetails = userService.loadUserByUsername(username);
+//        return passwordEncoder.matches(password, userDetails.getPassword());
+//    }
 }

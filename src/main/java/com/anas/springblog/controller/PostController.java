@@ -1,11 +1,12 @@
 package com.anas.springblog.controller;
 
 import com.anas.springblog.model.Post;
+import com.anas.springblog.model.User;
 import com.anas.springblog.service.PostService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
-import java.security.Principal;
 import java.util.List;
 
 @RestController
@@ -20,7 +21,7 @@ public class PostController {
     }
 
     @PostMapping
-    public Post createPost(@RequestBody Post post, Principal principal) {
-        return postService.createPost(post, principal.getName());
+    public Post createPost(@RequestBody Post post, @AuthenticationPrincipal User userDetails) {
+        return postService.createPost(post, userDetails.getId());
     }
 }

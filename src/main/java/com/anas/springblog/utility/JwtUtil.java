@@ -1,5 +1,6 @@
 package com.anas.springblog.utility;
 
+import com.anas.springblog.model.User;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.security.Keys;
@@ -13,12 +14,13 @@ import java.util.Date;
 public class JwtUtil {
 
     public static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10;
-    private final String SECRET_KEY = "your-key-keep-it-safe123456789@secret";
-    private final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
+    private static final String SECRET_KEY = "your-key-keep-it-safe123456789@secret";
+    private static final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
-    public String generateToken(String username){
+    public String generateToken(User user){
         return Jwts.builder()
-                .subject(username)
+                .claim("id",user.getId())
+                .subject(user.getUsername())
                 .issuedAt(new Date())
                 .expiration(new Date(System.currentTimeMillis() + EXPIRATION_TIME))
                 .signWith(key)
@@ -27,6 +29,9 @@ public class JwtUtil {
 
     public String extractUsername(String token){
         return getPayload(token).getSubject();
+    }
+    public Long extractUserId(String token) {
+        return getPayload(token).get("id",Long.class);
     }
 
     private Claims getPayload(String token) {
@@ -38,11 +43,14 @@ public class JwtUtil {
     }
 
 
-    public boolean validate(String username, UserDetails userDetails, String jwtToken) {
-        return username.equals(userDetails.getUsername()) && !isExpired(jwtToken);
+    public boolean validate(UserDetails userDetails, String token) {
+        final String username = extractUsername(token);
+        return username.equals(userDetails.getUsername()) && !isExpired(token);
     }
 
-    private boolean isExpired(String jwtToken) {
-        return getPayload(jwtToken).getExpiration().before(new Date());
+    private boolean isExpired(String token) {
+        return getPayload(token).getExpiration().before(new Date());
     }
+
+
 }

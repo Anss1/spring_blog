@@ -13,8 +13,14 @@ public class Post {
     private Long id;
     private String title;
     private String content;
+    private String createdAt;
     @ManyToOne
+    @JoinColumn(name = "user_id")
     private User user;
     @OneToMany(mappedBy = "post")
     private List<Comment> comments;
+
+    public void setUpdatedAt(String updatedAt){
+        this.createdAt = updatedAt;
+    }
 }

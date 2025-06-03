@@ -1,15 +1,17 @@
 package com.anas.springblog.controller;
 
+import com.anas.springblog.dto.CommentRequestDTO;
 import com.anas.springblog.dto.CommentResponseDTO;
-import com.anas.springblog.model.Comment;
 import com.anas.springblog.model.User;
 import com.anas.springblog.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 
+import java.nio.file.AccessDeniedException;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/api/comments")
@@ -18,27 +20,31 @@ public class CommentController {
     @Autowired
     private CommentService commentService;
 
+
     @GetMapping
     public List<CommentResponseDTO> getAllComments() {
-        return commentService.getAllComments()
-                .stream()
-                .map(this::commentDTO)
-                .collect(Collectors.toList());
+        return commentService.getAllComments();
     }
 
-    @PostMapping
-    public CommentResponseDTO createComment(@RequestBody Comment comment, @AuthenticationPrincipal User userDetails) {
-        comment.setUser(userDetails);
-        Comment savedComment = commentService.createComment(comment);
-        return commentDTO(savedComment);
+    @PostMapping("/comment")
+    public ResponseEntity<CommentResponseDTO> createComment( @RequestBody CommentRequestDTO commentRequest
+                                                            , @AuthenticationPrincipal User userDetails) {
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(commentService.createComment(commentRequest,userDetails));
     }
 
-    private CommentResponseDTO commentDTO(Comment comment){
-        return new CommentResponseDTO(
-                comment.getId(),
-                comment.getText(),
-                comment.getUser().getUsername(),
-                comment.getCreatedAt()
-        );
+    @PutMapping("/{id}")
+    public ResponseEntity<CommentResponseDTO> editComment( @PathVariable Long id
+                                        , @RequestBody CommentRequestDTO commentRequest
+                                        , @AuthenticationPrincipal User userDetails) throws AccessDeniedException {
+        return ResponseEntity.status(HttpStatus.OK).body(commentService.editComment(id,commentRequest,userDetails));
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteComment( @PathVariable Long id
+            , @AuthenticationPrincipal User userDetails) throws AccessDeniedException {
+        commentService.deleteComment(id,userDetails);
+        return ResponseEntity.status(HttpStatus.OK).body("Deleted successfully");
+    }
+
 }

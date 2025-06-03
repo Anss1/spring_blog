@@ -5,17 +5,14 @@ import com.anas.springblog.model.User;
 import com.anas.springblog.service.UserService;
 import com.anas.springblog.utility.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequestMapping("/api/auth")
-@CrossOrigin
 public class AuthController {
 
     @Autowired
@@ -41,20 +38,17 @@ public class AuthController {
     @PostMapping("/login")
     public ResponseEntity<String> login(@RequestBody AuthRequest authRequest) {
 
-        try {
-            authenticationManager.authenticate(
-                    new UsernamePasswordAuthenticationToken(
-                            authRequest.getUsername(),
-                            authRequest.getPassword()
-                    )
-            );
-            User loginUser = userService.loadUserByUsername(authRequest.getUsername());
-            String token = jwtUtil.generateToken(loginUser);
-            return ResponseEntity.ok(token);
-        }
-        catch (AuthenticationException e) {
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid Username or Password");
-        }
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        authRequest.getUsername(),
+                        authRequest.getPassword()
+                )
+        );
+        User loginUser = userService.loadUserByUsername(authRequest.getUsername());
+        String token = jwtUtil.generateToken(loginUser);
+        return ResponseEntity.ok(token);
+
+
         // This logic here for test purposes
 //        if (authenticate(authRequest.getUsername(), authRequest.getPassword())) {
 //            String token = jwtUtil.generateToken(authRequest.getUsername());

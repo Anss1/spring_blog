@@ -20,8 +20,8 @@ public class GlobalExceptionHandler {
 
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDenied(AccessDeniedException ex) {
-        return ResponseEntity.status(HttpStatus.FORBIDDEN)
-                .body(new ErrorResponse("FORBIDDEN", ex.getMessage()));
+        return ResponseEntity.status(HttpStatus.UNAUTHORIZED)
+                .body(new ErrorResponse("UNAUTHORIZED", ex.getMessage()));
     }
 
     @ExceptionHandler(AuthenticationException.class)

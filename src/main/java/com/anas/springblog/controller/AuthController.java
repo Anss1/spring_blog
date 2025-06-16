@@ -1,15 +1,23 @@
 package com.anas.springblog.controller;
 
 import com.anas.springblog.dto.AuthRequest;
+import com.anas.springblog.model.RefreshToken;
 import com.anas.springblog.model.User;
+import com.anas.springblog.service.RefreshTokenService;
 import com.anas.springblog.service.UserService;
 import com.anas.springblog.utility.JwtUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/auth")
@@ -17,6 +25,9 @@ public class AuthController {
 
     @Autowired
     private UserService userService;
+
+    @Autowired
+    private RefreshTokenService refreshTokenService;
 
     @Autowired
     private JwtUtil jwtUtil;
@@ -36,7 +47,7 @@ public class AuthController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity<String> login(@RequestBody AuthRequest authRequest) {
+    public ResponseEntity<?> login(@RequestBody AuthRequest authRequest) {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
@@ -45,23 +56,30 @@ public class AuthController {
                 )
         );
         User loginUser = userService.loadUserByUsername(authRequest.getUsername());
-        String token = jwtUtil.generateToken(loginUser);
-        return ResponseEntity.ok(token);
+        String accessToken = jwtUtil.generateToken(loginUser);
+        RefreshToken refreshToken = refreshTokenService.createRefreshToken(loginUser);
 
-
-        // This logic here for test purposes
-//        if (authenticate(authRequest.getUsername(), authRequest.getPassword())) {
-//            String token = jwtUtil.generateToken(authRequest.getUsername());
-//
-//            return ResponseEntity.ok(token);
-//        }
-//        throw new BadCredentialsException("Invalid username or password");
-
+        return ResponseEntity.ok(Map.of(
+                "accessToken", accessToken,
+                "refreshToken", refreshToken.getToken()
+        ));
+    }
+    @PostMapping("/logout")
+    public ResponseEntity<?> logout(@AuthenticationPrincipal User user) {
+        refreshTokenService.deleteByUserId(user.getId());
+        return ResponseEntity.ok("Logged out");
     }
 
-    // this method for test purposes
-//    private boolean authenticate(String username, String password) {
-//        User userDetails = userService.loadUserByUsername(username);
-//        return passwordEncoder.matches(password, userDetails.getPassword());
-//    }
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(@RequestBody Map<String, String> request) {
+        String refreshTokenString = request.get("refreshToken");
+
+        RefreshToken refreshToken = refreshTokenService.findByToken(refreshTokenString)
+                .map(refreshTokenService::verifyExpiration)
+                .orElseThrow();
+
+        String newAccessToken = jwtUtil.generateToken(refreshToken.getUser());
+
+        return ResponseEntity.ok(Map.of("accessToken", newAccessToken));
+    }
 }

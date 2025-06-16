@@ -13,7 +13,7 @@ import java.util.Date;
 @Component
 public class JwtUtil {
 
-    public static final long EXPIRATION_TIME = 1000 * 60 * 60 * 10;
+    public static final long EXPIRATION_TIME = 1000 * 60 * 15; // 15 minutes
     private static final String SECRET_KEY = "your-key-keep-it-safe123456789@secret";
     private static final SecretKey key = Keys.hmacShaKeyFor(SECRET_KEY.getBytes());
 
@@ -51,6 +51,7 @@ public class JwtUtil {
     private boolean isExpired(String token) {
         return getPayload(token).getExpiration().before(new Date());
     }
+
 
 
 }
